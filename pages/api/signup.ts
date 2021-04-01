@@ -3,11 +3,12 @@
 import bcrypt from "bcrypt";
 import { NextApiRequest, NextApiResponse } from "next";
 import shortid from "shortid";
+import { USERS_COLLECTION } from "../../util/constants";
 import { connectToDatabase } from "../../util/mongodb";
 import User from "../../util/types/User";
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
-  const { email, password } = req.body;
+  const { email, username, password } = req.body;
 
   const { db } = await connectToDatabase();
 
@@ -22,10 +23,10 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
   const user: User = {
     _id: shortid.generate(),
     email,
+    username,
     password: password_hash,
   };
 
-  db.collection("users").insertOne(user);
-  res.statusCode = 200;
+  db.collection(USERS_COLLECTION).insertOne(user);
   res.json({ success: true, message: "registered." });
 };

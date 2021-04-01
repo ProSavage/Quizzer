@@ -1,29 +1,31 @@
+import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { Moon, Sun } from "react-feather";
-import { useRecoilState } from "recoil";
+import { useRecoilState, useRecoilValue } from "recoil";
 import styled, { css } from "styled-components";
-import { themeState } from "../../styles/atoms/theme";
+import { themeState } from "../../atoms/theme";
+import { userState } from "../../atoms/user";
 import DarkTheme from "../../styles/theme/DarkTheme";
 import LightTheme from "../../styles/theme/LightTheme";
 import PropsTheme from "../../styles/theme/PropsTheme";
 import ActiveLink from "./../ActiveLink";
 const links = [
   {
-    link: "/",
-    text: "Home",
+    link: "/login",
+    text: "Login",
   },
   {
-    link: "/faq",
-    text: "FAQ",
-  },
-  {
-    link: "/contact",
-    text: "Contact",
+    link: "/signup",
+    text: "Signup",
   },
 ];
 
 export default function Navbar(props) {
   const [theme, setTheme] = useRecoilState(themeState);
+
+  const user = useRecoilValue(userState);
+
+  const router = useRouter();
 
   const getLogoPath = () => {
     return theme === DarkTheme ? "logo-dark.svg" : "logo-light.svg";
@@ -68,15 +70,20 @@ export default function Navbar(props) {
                   </ActiveLink>
                 </LinkWrapper>
               ))
-              .concat(
+              .concat([
+                <LinkWrapper>
+                  <ActiveLink href={"/manager"}>
+                    <LinkText>{user?.username}</LinkText>
+                  </ActiveLink>
+                </LinkWrapper>,
                 <LinkWrapper
                   onClick={() =>
                     setTheme(theme === DarkTheme ? LightTheme : DarkTheme)
                   }
                 >
                   {theme === DarkTheme ? <Moon /> : <Sun />}
-                </LinkWrapper>
-              )}
+                </LinkWrapper>,
+              ])}
           </LinksWrapper>
         )}
       </Content>
@@ -167,7 +174,7 @@ const LinksWrapper = styled.div`
   }
 `;
 
-const LinkText = styled.a`
+const LinkText = styled.p`
   font-size: 1rem;
   cursor: pointer;
 
