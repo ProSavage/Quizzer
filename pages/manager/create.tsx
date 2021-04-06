@@ -14,23 +14,6 @@ export default function Create() {
   const [questions, setQuestions] = useRecoilState(quizManagerQuestionsState);
 
   const createQuestion = () => {
-    const blankQuestion: QuizQuestion = {
-      question: "What is 3 + 4?",
-      answers: [
-        {
-          answer: "5",
-          correct: false,
-        },
-        {
-          answer: "7",
-          correct: true,
-        },
-        {
-          answer: "8",
-          correct: false,
-        },
-      ],
-    };
     setQuestions(questions.concat(blankQuestion));
   };
 
@@ -91,3 +74,21 @@ const QuestionManagerHeader = styled.div`
   display: flex;
   justify-content: space-between;
 `;
+
+const blankQuestion: QuizQuestion = {
+  question: "What is 3 + 4?",
+  answers: [
+    {
+      answer: "5",
+      correct: false,
+    },
+    {
+      answer: "7",
+      correct: true,
+    },
+    {
+      answer: "8",
+      correct: false,
+    },
+  ],
+};
