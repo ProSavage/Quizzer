@@ -1,4 +1,4 @@
-import { createGlobalStyle, ThemeProvider } from "styled-components";
+import { createGlobalStyle } from "styled-components";
 import PropsTheme from "./theme/PropsTheme";
 
 const GlobalStyle = createGlobalStyle`
@@ -9,6 +9,7 @@ const GlobalStyle = createGlobalStyle`
         background: ${(props: PropsTheme) => props.theme.background};
         padding: 0;
         margin: 0;
+        overflow-x: hidden;
         font-family: 'Roboto', -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
             Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
     }
@@ -33,6 +34,6 @@ const GlobalStyle = createGlobalStyle`
     }
 
 
-`
+`;
 
 export default GlobalStyle;

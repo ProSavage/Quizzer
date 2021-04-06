@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { useRouter } from "next/router";
 import { useState } from "react";
 import { useRecoilState } from "recoil";
 import styled from "styled-components";
@@ -13,6 +14,8 @@ export default function Login() {
   const [status, setStatus] = useState("");
 
   const [user, setUser] = useRecoilState(userState);
+
+  const router = useRouter();
 
   const login = () => {
     if (email.length === 0 || password.length === 0) {
@@ -31,6 +34,7 @@ export default function Login() {
           setToken(res.data.token);
           buildAxios();
           setUser(res.data.user);
+          router.push("/manager");
         } else {
           setStatus(res.data.message);
         }
