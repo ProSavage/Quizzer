@@ -132,6 +132,7 @@ const Answer = styled.div`
   flex-direction: row;
   align-items: center;
   margin: 0.25em 0;
+  flex-wrap: wrap;
 `;
 
 const AnswerOption = styled.div`
