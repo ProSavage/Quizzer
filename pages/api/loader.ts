@@ -18,7 +18,10 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
   var quiz = await db.collection<Quiz>("quizzes").findOne({_id: quiz_id});
   
   if (quiz === null) {
-    res.json({ success: false, message: "Invalid quiz ID.", quiz: EmptyQuiz});
+    res.json({ success: false, 
+      message: "Invalid quiz ID.", 
+      quiz: EmptyQuiz, 
+      quiz_with_answers: EmptyQuiz});
     return;
   }
 

@@ -1,11 +1,12 @@
 import React, { useState } from "react";
-import { useRecoilState } from "recoil";
+import { useRecoilState, useRecoilValue } from "recoil";
 import styled from "styled-components";
 import { QuizQuestion } from "../../util/types/Quiz";
 import Quiz from "../../util/types/Quiz";
 import QuestionDisplay from "../../components/manager/QuestionDisplay";
 import { quizTakerQuiz } from "../../atoms/QuizTakerQuiz";
 import getAxios, { buildAxios } from "../../util/AxiosBuilder";
+import { userState } from "../../atoms/user";
 import { debug } from "node:console";
 
 export default function Participate() {
@@ -13,6 +14,7 @@ export default function Participate() {
     const [quizID, setQuizID] = useState("");
     const [searchMessage, setSearchMessage] = useState("");
     const [quiz, setQuiz] = useRecoilState(quizTakerQuiz);
+    const user = useRecoilValue(userState);
 
     const loadQuestions = () => {
       
@@ -32,6 +34,26 @@ export default function Participate() {
         }
       });
     };
+
+    const submitAnswers = () => {
+      getAxios()
+      .post("/grader", {
+        _id: quizID,
+        user: user,
+        quiz: quiz,
+      })
+      .then((res) => {
+        if (res.data.success) {
+          buildAxios();
+          setQuiz(res.data.quiz);
+          setSearchMessage(res.data.message);
+        }
+        else {
+          setSearchMessage(res.data.message);
+          setQuiz(res.data.quiz);
+        }
+      });
+    }
   
     return (
       <Wrapper>
@@ -53,6 +75,13 @@ export default function Participate() {
           <h3>{quiz.name}</h3>
           <label>{quiz.description}</label>
         </Metadata>
+        <button
+        onClick={(e) => {
+          e.preventDefault();
+          submitAnswers();
+          }}
+          type={"submit"}
+        >SUBMIT QUIZ</button>
         <QuestionsContainer>
           <QuestionManagerHeader>
             <strong>{quiz.questions.length} Questions</strong>
@@ -61,7 +90,6 @@ export default function Participate() {
             <QuestionDisplay key={key} question={question} id={key} />
           ))}
         </QuestionsContainer>
-        <button>SUBMIT QUIZ</button>
       </Wrapper>
     );
   }
