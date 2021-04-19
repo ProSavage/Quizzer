@@ -22,6 +22,8 @@ export default function Manager() {
         <Link href={"/manager/create"}>
           <button>CREATE</button>
         </Link>
+      </Header>
+      <Header>
         <h2>Take Quiz</h2>
         <Link href={"/manager/participate"}>
           <button>TAKE</button>
@@ -33,6 +35,7 @@ export default function Manager() {
 
 const Wrapper = styled.div`
   display: flex;
+  flex-direction: column;
   width: 100%;
   margin: 1em 0;
 `;
@@ -41,4 +44,5 @@ const Header = styled.div`
   display: flex;
   justify-content: space-between;
   width: 100%;
+  margin: 1em 0;
 `;
