@@ -1,25 +1,59 @@
 import React, { useState } from "react";
+import { useResetRecoilState, useRecoilValue } from "recoil";
 import { useRecoilState } from "recoil";
 import styled from "styled-components";
 import { quizManagerQuestionsState } from "../../atoms/QuizManagerQuestions";
 import QuestionManager from "../../components/manager/QuestionManger";
 import { QuizQuestion } from "../../util/types/Quiz";
+import getAxios, { buildAxios } from "../../util/AxiosBuilder";
+import { userState } from "../../atoms/user";
+import shortid from "shortid";
 
 export default function Create() {
   const [metadata, setMetadata] = useState({
     name: "",
     description: "",
   });
-
+  const [submissionStatus, setSubmissionStatus] = useState("");
   const [questions, setQuestions] = useRecoilState(quizManagerQuestionsState);
+  const user = useRecoilValue(userState);
 
   const createQuestion = () => {
     setQuestions(questions.concat(blankQuestion));
   };
 
+  const submitCreatedQuiz = () => {
+    getAxios()
+    .post("/publisher", {
+      _id: shortid.generate(),
+      author: user.username,
+      name: metadata.name,
+      description: metadata.description,
+      questions: questions,
+    })
+    .then((res) => {
+      if (res.data.success) {
+        buildAxios();
+        setSubmissionStatus(res.data.message);
+      }
+      else {
+        setSubmissionStatus(res.data.message);
+        return;
+      }
+    });
+  }
+
   return (
     <Wrapper>
       <h2>Quiz Creator</h2>
+      <p>{submissionStatus}</p>
+      <button
+        onClick={(e) => {
+          e.preventDefault();
+          submitCreatedQuiz();
+          }}
+          type={"submit"}
+      >SUBMIT QUIZ</button>
       <Metadata>
         <h3>Quiz Metadata</h3>
         <label>Name</label>
@@ -45,7 +79,6 @@ export default function Create() {
           <QuestionManager key={key} question={question} id={key} />
         ))}
       </QuestionManagerContainer>
-      <button>SUBMIT QUIZ</button>
     </Wrapper>
   );
 }
