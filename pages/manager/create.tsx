@@ -1,8 +1,11 @@
 import React, { useState } from "react";
-import { useRecoilState } from "recoil";
+import { useRecoilState, useRecoilValue } from "recoil";
+import shortid from "shortid";
 import styled from "styled-components";
 import { quizManagerQuestionsState } from "../../atoms/QuizManagerQuestions";
+import { userState } from "../../atoms/user";
 import QuestionManager from "../../components/manager/QuestionManger";
+import getAxios, { buildAxios } from "../../util/AxiosBuilder";
 import { QuizQuestion } from "../../util/types/Quiz";
 
 export default function Create() {
@@ -10,16 +13,63 @@ export default function Create() {
     name: "",
     description: "",
   });
-
+  const [submissionStatus, setSubmissionStatus] = useState("");
   const [questions, setQuestions] = useRecoilState(quizManagerQuestionsState);
+  const user = useRecoilValue(userState);
 
+  const [status, setStatus] = useState("");
   const createQuestion = () => {
     setQuestions(questions.concat(blankQuestion));
+  };
+
+  const submitCreatedQuiz = () => {
+    if (metadata.name.length === 0) {
+      setStatus("name must not be empty");
+      return;
+    }
+
+    if (metadata.description.length === 0) {
+      setStatus("description cannot be empty.");
+      return;
+    }
+
+    if (questions.length === 0) {
+      setStatus("must have atleast one question.");
+      return;
+    }
+
+    getAxios()
+      .post("/publisher", {
+        _id: shortid.generate(),
+        author: user.username,
+        name: metadata.name,
+        description: metadata.description,
+        questions: questions,
+      })
+      .then((res) => {
+        if (res.data.success) {
+          buildAxios();
+          setSubmissionStatus(res.data.message);
+        } else {
+          setSubmissionStatus(res.data.message);
+          return;
+        }
+      });
   };
 
   return (
     <Wrapper>
       <h2>Quiz Creator</h2>
+      <p>{submissionStatus}</p>
+      <button
+        onClick={(e) => {
+          e.preventDefault();
+          submitCreatedQuiz();
+        }}
+        type={"submit"}
+      >
+        SUBMIT QUIZ
+      </button>
       <Metadata>
         <h3>Quiz Metadata</h3>
         <label>Name</label>
@@ -45,7 +95,8 @@ export default function Create() {
           <QuestionManager key={key} question={question} id={key} />
         ))}
       </QuestionManagerContainer>
-      <button>SUBMIT QUIZ</button>
+      {status}
+      <button onClick={submitCreatedQuiz}>SUBMIT QUIZ</button>
     </Wrapper>
   );
 }
