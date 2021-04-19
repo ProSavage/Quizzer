@@ -81,9 +81,6 @@ export default function Participate() {
         SUBMIT QUIZ
       </button>
       <QuestionsContainer>
-        <QuestionManagerHeader>
-          <strong>{quiz.questions.length} Questions</strong>
-        </QuestionManagerHeader>
         {quiz.questions.map((question, key) => (
           <QuestionDisplay key={key} question={question} id={key} />
         ))}
