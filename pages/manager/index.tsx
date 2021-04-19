@@ -22,6 +22,10 @@ export default function Manager() {
         <Link href={"/manager/create"}>
           <button>CREATE</button>
         </Link>
+        <h2>Take Quiz</h2>
+        <Link href={"/manager/participate"}>
+          <button>TAKE</button>
+        </Link>
       </Header>
     </Wrapper>
   );
