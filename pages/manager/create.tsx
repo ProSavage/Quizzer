@@ -1,8 +1,10 @@
+import { useRouter } from "next/router";
 import React, { useState } from "react";
 import { useRecoilState } from "recoil";
 import styled from "styled-components";
 import { quizManagerQuestionsState } from "../../atoms/QuizManagerQuestions";
 import QuestionManager from "../../components/manager/QuestionManger";
+import getAxios from "../../util/AxiosBuilder";
 import { QuizQuestion } from "../../util/types/Quiz";
 
 export default function Create() {
@@ -13,8 +15,38 @@ export default function Create() {
 
   const [questions, setQuestions] = useRecoilState(quizManagerQuestionsState);
 
+  const [status, setStatus] = useState("");
   const createQuestion = () => {
     setQuestions(questions.concat(blankQuestion));
+  };
+
+  const router = useRouter();
+
+  const submitQuiz = () => {
+    if (metadata.name.length === 0) {
+      setStatus("name must not be empty");
+      return;
+    }
+
+    if (metadata.description.length === 0) {
+      setStatus("description cannot be empty.");
+      return;
+    }
+
+    if (questions.length === 0) {
+      setStatus("must have atleast one question.");
+      return;
+    }
+
+    getAxios()
+      .post("/create", {
+        name: metadata.name,
+        questions: questions,
+        description: metadata.description,
+      })
+      .then((res) => {
+        router.push("/manager");
+      });
   };
 
   return (
@@ -45,7 +77,8 @@ export default function Create() {
           <QuestionManager key={key} question={question} id={key} />
         ))}
       </QuestionManagerContainer>
-      <button>SUBMIT QUIZ</button>
+      {status}
+      <button onClick={submitQuiz}>SUBMIT QUIZ</button>
     </Wrapper>
   );
 }

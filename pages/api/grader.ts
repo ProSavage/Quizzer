@@ -1,9 +1,8 @@
 import { NextApiRequest, NextApiResponse } from "next";
-import { debug } from "node:console";
+import shortid from "shortid";
 import { connectToDatabase } from "../../util/mongodb";
 import Quiz from "../../util/types/Quiz";
 import Results from "../../util/types/Results";
-import shortid from "shortid";
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
   const quiz_id = req.body._id;
@@ -14,15 +13,15 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     _id: "",
     name: "",
     description: "",
-    questions: []
-  }
-  
-  const quiz = await db.collection<Quiz>("quizzes").findOne({_id: quiz_id});
+    questions: [],
+  };
+
+  const quiz = await db.collection<Quiz>("quizzes").findOne({ _id: quiz_id });
 
   if (quiz === null) {
-    res.json({ 
-      success: false, 
-      message: "Error submitting quiz.", 
+    res.json({
+      success: false,
+      message: "Error submitting quiz.",
       quiz: quiz_with_user_answers,
     });
     return;
@@ -30,22 +29,25 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
 
   // CHECK ANSWERS
   var total_correct = 0.0;
-  var questions_correct : Boolean[] = [];
+  var questions_correct: Boolean[] = [];
   const num_questions = quiz.questions.length;
-  for (var i = 0; i < num_questions; i++) {
+  for (let i = 0; i < num_questions; i++) {
     const num_answers = quiz.questions[i].answers.length;
     var question_correct = true;
-    for (var j = 0; j < num_answers; j++) {
-      if (quiz.questions[i].answers[j].correct != quiz_with_user_answers.questions[i].answers[j].correct) {
+    for (let j = 0; j < num_answers; j++) {
+      if (
+        quiz.questions[i].answers[j].correct !=
+        quiz_with_user_answers.questions[i].answers[j].correct
+      ) {
         question_correct = false;
       }
     }
     questions_correct.push(question_correct);
     if (question_correct) {
-        total_correct += 1;
+      total_correct += 1;
     }
   }
-  const score = total_correct / num_questions * 100;
+  const score = (total_correct / num_questions) * 100;
   const results: Results = {
     _id: shortid.generate(),
     username: user.username,
